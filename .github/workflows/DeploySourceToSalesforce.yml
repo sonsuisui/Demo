@@ -43,11 +43,17 @@ jobs:
     - name: 'Authenticate against dev hub'
       run: node_modules/sfdx-cli/bin/run force:auth:sfdxurl:store -f SFDX_AUTH_INFO -s -a AUTH_INFO
 
-    # - name: 'Get all test class names'
+    # - name: Run Apex test
     #   shell: bash
-    #   run: | 
-    #     testClassNmes = cat manifest/package_diff.xml | grep -o -P '<members>[A-Za-z0-9]*Test[s]*</members>' | sed 's/<members>//g' | sed 's/<\/members>//g' | tr '\n' ',' | sed s/,$//
-    #     echo $testClassNmes
+    #   run: |
+    #     sudo cat manifest/package_diff.xml | grep -o -P '<members>[A-Za-z0-9]*Test[s]*</members>' | sed 's/<members>//g' | sed 's/<\/members>//g' | tr '\n' ',' | sed s/,$// > TEST_CLASS
+    #     node_modules/sfdx-cli/bin/run force:apex:test:run --resultformat tap --codecoverage -c -r human -n $(cat TEST_CLASS)
+
+    # - name: Deploy source
+    #   id: Deploy
+    #   if: github.event_name == 'push'
+    #   run:
+    #     node_modules/sfdx-cli/bin/run force:source:deploy -x manifest/package_diff.xml -u AUTH_INFO --json --loglevel fatal
 
     - name: Run Apex test
       shell: bash
@@ -57,6 +63,8 @@ jobs:
 
     - name: Deploy source
       id: Deploy
+      shell: bash
       if: github.event_name == 'push'
-      run:
-        node_modules/sfdx-cli/bin/run force:source:deploy -x manifest/package_diff.xml -u AUTH_INFO --json --loglevel fatal
+      run: |
+        sudo cat manifest/package_diff.xml | grep -o -P '<members>[A-Za-z0-9]*Test[s]*</members>' | sed 's/<members>//g' | sed 's/<\/members>//g' | tr '\n' ',' | sed s/,$// > TEST_CLASS
+        node_modules/sfdx-cli/bin/run force:source:deploy -x manifest/package_diff.xml -u AUTH_INFO --json --loglevel fatal --testlevel RunSpecifiedTests --runtests $(cat TEST_CLASS)
