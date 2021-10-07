@@ -56,7 +56,7 @@ jobs:
         sudo cat manifest/package_diff.xml
         testClassNmes=sudo cat manifest/package_diff.xml | grep -o -P '<members>[A-Za-z0-9]*Test[s]*</members>' | sed 's/<members>//g' | sed 's/<\/members>//g' | tr '\n' ',' | sed s/,$//
         echo $testClassNmes
-        node_modules/sfdx-cli/bin/run force:apex:test:run --resultformat tap --codecoverage -c -r human -n $testClassNmes
+        sfdx force:apex:test:run --resultformat tap --codecoverage -c -r human -n "$testClassNmes"
 
     - name: Deploy source
       id: Deploy
