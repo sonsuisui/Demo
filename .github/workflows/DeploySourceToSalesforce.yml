@@ -68,7 +68,7 @@ jobs:
       run: |
         sudo cat manifest/package_diff.xml | grep -o -P '<members>[A-Za-z0-9]*Test[s]*</members>' | sed 's/<members>//g' | sed 's/<\/members>//g' | tr '\n' ',' | sed s/,$// > TEST_CLASS
         echo "AAAAAAAAAAAAA"
-
+        wc -c TEST_CLASS
         echo "BBBBBBBBBBBBB"
         if [ $(wc -c TEST_CLASS) == 0 ];then
           echo "1111111111111"
