@@ -38,7 +38,7 @@ jobs:
         node_modules/sfdx-cli/bin/run plugins --core
     - name: 'Populate auth file with SFDX_URL secret'
       shell: bash
-      run: 'echo ${{ secrets.SALESFORCEAUTHINFO }} > SFDX_AUTH_INFO'
+      run: 'echo ${{ secrets.TEST_SECRET_NAME }} > SFDX_AUTH_INFO'
 
     - name: 'Authenticate against dev hub'
       run: node_modules/sfdx-cli/bin/run force:auth:sfdxurl:store -f SFDX_AUTH_INFO -s -a AUTH_INFO
@@ -51,4 +51,4 @@ jobs:
       id: Deploy
       if: github.event_name == 'push'
       run:
-        node_modules/sfdx-cli/bin/run force:source:deploy -p force-app -u AUTH_INFO --json --loglevel fatal
+        node_modules/sfdx-cli/bin/run force:source:deploy -x manifest/package_diff.xml -u AUTH_INFO --json --loglevel fatal
